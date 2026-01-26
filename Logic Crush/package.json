@@ -1,0 +1,21 @@
+{
+  "name": "logic-crush",
+  "version": "1.0.0",
+  "description": "Juego match-3 educativo - Logic Crush",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.example.logiccrush",
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "devDependencies": {
+    "electron": "^25.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}
