@@ -21,6 +21,7 @@
       <button id="restart">Reiniciar</button>
     </footer>
   </div>
+
   <!-- Menu -->
   <div id="menu" class="screen hidden">
     <h2>Logic Crush</h2>
@@ -30,10 +31,45 @@
       <button id="btnOptions">Opciones</button>
       <button id="btnExit">Salir</button>
     </div>
+    <button id="btnInstructions" class="btn-secondary">Ver instrucciones</button>
     <div id="level-select" style="margin-top:12px;display:flex;gap:10px;">
       <button class="level-btn" data-level="0">Nivel 1</button>
       <button class="level-btn" data-level="1">Nivel 2</button>
       <button class="level-btn" data-level="2">Nivel 3</button>
+    </div>
+  </div>
+
+  <!-- Instructions Popup -->
+  <div id="instructions" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
+    <div class="modal-content">
+      <button id="instructions-close" class="modal-close" aria-label="Cerrar">×</button>
+      <h3 id="instructions-title">Instrucciones básicas</h3>
+      <ul class="intro-list">
+        <li>Selecciona dos fichas adyacentes para intercambiarlas.</li>
+        <li>Forma grupos de 3 para ganar puntos.</li>
+        <li>Si no hay combinación, pierdes una vida.</li>
+        <li>Los puntos de ronda se guardan al completar el nivel.</li>
+        <li>Usa <strong>Barajar</strong> si te quedas sin movimientos.</li>
+      </ul>
+
+      <h3>Objetos de la tienda</h3>
+      <div class="store-items intro-store-items">
+        <div class="item">
+          <img src="img/prop/Corazon.png" alt="vida">
+          <div>+1 Vida - 50 pts</div>
+        </div>
+        <div class="item">
+          <img src="img/prop/Estrella.png" alt="estrella">
+          <div>Bono - 100 pts</div>
+        </div>
+        <div class="item">
+          <img src="img/prop/Producto.png" alt="producto">
+          <div>Multiplicador - 150 pts</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="instructions-ack" class="btn-secondary">Entendido</button>
+      </div>
     </div>
   </div>
 

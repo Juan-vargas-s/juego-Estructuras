@@ -13,11 +13,15 @@ const BTN_PLAY = document.getElementById('btnPlay');
 const BTN_STORE = document.getElementById('btnStore');
 const BTN_OPTIONS = document.getElementById('btnOptions');
 const BTN_EXIT = document.getElementById('btnExit');
+const BTN_INSTRUCTIONS = document.getElementById('btnInstructions');
 const STORE_BACK = document.getElementById('store-back');
 const OPTIONS_BACK = document.getElementById('options-back');
 const MUTE = document.getElementById('mute');
 const FINISH_LEVEL = document.getElementById('finish-level');
 const EXIT_TO_MENU = document.getElementById('exit-to-menu');
+const INSTRUCTIONS = document.getElementById('instructions');
+const INSTRUCTIONS_CLOSE = document.getElementById('instructions-close');
+const INSTRUCTIONS_ACK = document.getElementById('instructions-ack');
 
 const soundMatch = document.getElementById('sound-match');
 const soundClick = document.getElementById('sound-click');
@@ -293,6 +297,16 @@ BTN_EXIT.addEventListener('click', ()=>{ window.close(); });
 STORE_BACK.addEventListener('click', ()=>{ showScreen(MENU); });
 OPTIONS_BACK.addEventListener('click', ()=>{ showScreen(MENU); });
 
+function openInstructions(){ if(INSTRUCTIONS) INSTRUCTIONS.classList.remove('hidden'); }
+function closeInstructions(){ if(INSTRUCTIONS) INSTRUCTIONS.classList.add('hidden'); }
+function acknowledgeInstructions(){ closeInstructions(); showScreen(MENU); }
+
+if(BTN_INSTRUCTIONS) BTN_INSTRUCTIONS.addEventListener('click', openInstructions);
+if(INSTRUCTIONS_CLOSE) INSTRUCTIONS_CLOSE.addEventListener('click', closeInstructions);
+if(INSTRUCTIONS_ACK) INSTRUCTIONS_ACK.addEventListener('click', acknowledgeInstructions);
+if(INSTRUCTIONS) INSTRUCTIONS.addEventListener('click', (e)=>{ if(e.target === INSTRUCTIONS) closeInstructions(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeInstructions(); });
+
 // level select buttons in menu
 document.querySelectorAll('.level-btn').forEach(b=>{
   b.addEventListener('click', (e)=>{
@@ -397,6 +411,10 @@ document.querySelectorAll('[data-action="buy-life"]').forEach(b=>{
     else alert('Puntos insuficientes');
   });
 });
+
+// Show instructions first, then go to menu on "Entendido"
+document.body.className = 'scene-lobby';
+openInstructions();
 
 // initial
 showScreen(MENU);

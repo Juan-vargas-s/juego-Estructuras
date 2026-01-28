@@ -9,6 +9,7 @@ body{display:flex;align-items:center;justify-content:center;height:100vh;margin:
 .cell.selected{outline:3px solid rgba(255,213,79,0.9);transform:translateZ(0)}
 button{margin:8px;padding:8px 12px;border-radius:6px;border:none;background:#2b9cff;color:#fff;cursor:pointer}
 #score{font-weight:700}
+.btn-secondary{background:#1b6b9a}
 
 /* Screens */
 .screen{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#10202b, #052530);color:#fff}
@@ -21,6 +22,20 @@ button{margin:8px;padding:8px 12px;border-radius:6px;border:none;background:#2b9
 .level-info{display:inline-block;color:#fff;margin-right:12px}
 .screen h2{margin-bottom:12px}
 .store-quiz{margin-top:12px;background:#08121a;padding:8px;border-radius:6px}
+
+/* Intro / Instructions */
+.intro-card{max-width:760px;width:min(92vw,760px);background:rgba(8,18,26,0.9);padding:20px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.7)}
+.intro-card h2{margin-top:0}
+.intro-list{margin:8px 0 16px 18px;line-height:1.5}
+.intro-store-items{margin:8px 0 16px 0;flex-wrap:wrap;justify-content:center}
+.intro-store-items .item{min-width:180px}
+
+/* Modal */
+.modal{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:10}
+.modal.hidden{display:none}
+.modal-content{position:relative;max-width:760px;width:min(92vw,760px);background:rgba(8,18,26,0.96);padding:20px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.7)}
+.modal-close{position:absolute;right:10px;top:10px;background:#ff6b6b;border:none;border-radius:50%;width:32px;height:32px;line-height:30px;font-size:20px;color:#fff;cursor:pointer}
+.modal-actions{display:flex;justify-content:flex-end;margin-top:8px}
 
 /* background scene */
 /* Backgrounds: use gradients and subtle textures instead of image files */
