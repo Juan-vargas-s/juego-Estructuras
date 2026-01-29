@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Logic Crush</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game">
+    <header>
+      <h1>Logic Crush</h1>
+      <div class="hud"><div id="score">Puntos: 0</div><div id="round-score">Puntos de ronda: 0</div><div id="lives">Vidas: 3</div></div>
+    </header>
+    <div id="grid" class="grid"></div>
+    <footer>
+      <div class="level-info">Nivel: <span id="level-name">-</span> | Objetivo: <span id="level-target">-</span></div>
+      <button id="finish-level">Terminar Nivel</button>
+      <button id="exit-to-menu">Volver al menú</button>
+      <button id="shuffle">Barajar</button>
+      <button id="restart">Reiniciar</button>
+    </footer>
+  </div>
+
+  <!-- Menu -->
+  <div id="menu" class="screen hidden">
+    <h2>Logic Crush</h2>
+    <div class="menu-buttons">
+      <button id="btnPlay">Jugar</button>
+      <button id="btnStore">Tienda</button>
+      <button id="btnOptions">Opciones</button>
+      <button id="btnExit">Salir</button>
+    </div>
+    <button id="btnInstructions" class="btn-secondary">Ver instrucciones</button>
+    <div id="level-select" style="margin-top:12px;display:flex;gap:10px;">
+      <button class="level-btn" data-level="0">Nivel 1</button>
+      <button class="level-btn" data-level="1">Nivel 2</button>
+      <button class="level-btn" data-level="2">Nivel 3</button>
+    </div>
+  </div>
+
+  <!-- Instructions Popup -->
+  <div id="instructions" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
+    <div class="modal-content">
+      <button id="instructions-close" class="modal-close" aria-label="Cerrar">×</button>
+      <h3 id="instructions-title">Instrucciones básicas</h3>
+      <ul class="intro-list">
+        <li>Selecciona dos fichas adyacentes para intercambiarlas.</li>
+        <li>Forma grupos de 3 para ganar puntos.</li>
+        <li>Si no hay combinación, pierdes una vida.</li>
+        <li>Los puntos de ronda se guardan al completar el nivel.</li>
+        <li>Usa <strong>Barajar</strong> si te quedas sin movimientos.</li>
+      </ul>
+
+      <h3>Objetos de la tienda</h3>
+      <div class="store-items intro-store-items">
+        <div class="item">
+          <img src="img/prop/Corazon.png" alt="vida">
+          <div>+1 Vida - 50 pts</div>
+        </div>
+        <div class="item">
+          <img src="img/prop/Estrella.png" alt="estrella">
+          <div>Bono - 100 pts</div>
+        </div>
+        <div class="item">
+          <img src="img/prop/Producto.png" alt="producto">
+          <div>Multiplicador - 150 pts</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="instructions-ack" class="btn-secondary">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Store -->
+  <div id="store" class="screen hidden">
+    <h2>Tienda</h2>
+    <div class="store-bg"></div>
+    <div class="store-score" id="store-score">Puntos: 0</div>
+    <div id="store-items" class="store-items">
+      <div class="item">
+        <img src="img/prop/Corazon.png" alt="vida">
+        <div>+1 Vida - 50 pts</div>
+        <button data-cost="50" data-action="buy-life">Comprar</button>
+      </div>
+      <div class="item">
+        <img src="img/prop/Estrella.png" alt="estrella">
+        <div>Bono - 100 pts</div>
+        <button data-cost="100" data-action="buy-bonus">Comprar</button>
+      </div>
+      <div class="item">
+        <img src="img/prop/Producto.png" alt="producto">
+        <div>Multiplicador - 150 pts</div>
+        <button data-cost="150" data-action="buy-mult">Comprar</button>
+      </div>
+    </div>
+    <div class="store-quiz">
+      <h3>Preguntas (Gana puntos) <button id="btn-random-quiz" class="btn-secondary" style="margin-left:8px;">Otras preguntas</button></h3>
+      <div id="quiz-root"></div>
+    </div>
+    <button id="store-back">Volver</button>
+  </div>
+
+  <!-- Options placeholder -->
+  <div id="options" class="screen hidden">
+    <h2>Opciones</h2>
+    <label><input type="checkbox" id="mute"> Silenciar</label>
+    <button id="options-back">Volver</button>
+  </div>
+
+  <audio id="sound-match" src="music/match.wav" preload="auto"></audio>
+  <audio id="sound-click" src="music/click.wav" preload="auto"></audio>
+  <script src="js/game.js"></script>
+</body>
+</html>

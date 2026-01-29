@@ -1,0 +1,89 @@
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#1f2b3a;color:#fff}
+#game{width:min(92vw,640px);max-width:640px}
+#game header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.hud{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.08));box-shadow:0 10px 30px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.02);width:100%}
+.cell{aspect-ratio:1/1;border-radius:8px;background:linear-gradient(145deg,#09202a,#03121a);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px rgba(255,255,255,0.02), 0 6px 10px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.02);overflow:hidden}
+.cell img{max-width:70%;max-height:70%;object-fit:contain;pointer-events:none;transition:transform 180ms cubic-bezier(.2,.9,.2,1),opacity 120ms}
+.cell.selected{outline:3px solid rgba(255,213,79,0.9);transform:translateZ(0)}
+button{margin:8px;padding:8px 12px;border-radius:6px;border:none;background:#2b9cff;color:#fff;cursor:pointer}
+#score{font-weight:700}
+.btn-secondary{background:#1b6b9a}
+
+/* Screens */
+.screen{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#10202b, #052530);color:#fff}
+.screen.hidden{display:none}
+.menu-buttons{display:flex;flex-direction:column;gap:12px}
+.store-items{display:flex;gap:12px}
+.store-items .item{background:#0f1720;padding:10px;border-radius:8px;text-align:center}
+.store-items img{width:64px;height:64px}
+
+.level-info{display:inline-block;color:#fff;margin-right:12px}
+.screen h2{margin-bottom:12px}
+.store-quiz{margin-top:12px;background:#08121a;padding:8px;border-radius:6px}
+
+/* Intro / Instructions */
+.intro-card{max-width:760px;width:min(92vw,760px);background:rgba(8,18,26,0.9);padding:20px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.7)}
+.intro-card h2{margin-top:0}
+.intro-list{margin:8px 0 16px 18px;line-height:1.5}
+.intro-store-items{margin:8px 0 16px 0;flex-wrap:wrap;justify-content:center}
+.intro-store-items .item{min-width:180px}
+
+/* Modal */
+.modal{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:10}
+.modal.hidden{display:none}
+.modal-content{position:relative;max-width:760px;width:min(92vw,760px);background:rgba(8,18,26,0.96);padding:20px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.7)}
+.modal-close{position:absolute;right:10px;top:10px;background:#ff6b6b;border:none;border-radius:50%;width:32px;height:32px;line-height:30px;font-size:20px;color:#fff;cursor:pointer}
+.modal-actions{display:flex;justify-content:flex-end;margin-top:8px}
+
+/* background scene */
+/* Backgrounds: use gradients and subtle textures instead of image files */
+body.scene-lobby{background:linear-gradient(180deg,#0e2630,#07151a);background-size:cover;background-position:center}
+body.scene-tienda{background:linear-gradient(180deg,#17323a,#061217);background-size:cover;background-position:center}
+body.scene-default{background:linear-gradient(180deg,#071826,#00121a)}
+
+#store{position:relative}
+.store-bg{position:absolute;left:0;right:0;top:0;bottom:0;opacity:0.14;background:radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03), transparent 20%), linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.2));z-index:0;border-radius:6px}
+.store-bg{pointer-events:none}
+.store-items{position:relative;z-index:2}
+.store-quiz{position:relative;z-index:2}
+#store button, #store .store-items .item, #store .store-quiz{position:relative;z-index:2}
+
+footer button#exit-to-menu{background:#ff6b6b}
+
+/* layout helpers: footer wrap + small-screen adjustments */
+footer{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+@media (max-width:420px){
+	.menu-buttons{width:90vw}
+	.store-items{flex-direction:column;align-items:center}
+	.store-items .item{width:90%}
+}
+
+/* Make game container stand out */
+#game{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.25));padding:16px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.02)}
+
+/* level buttons style */
+.level-btn{padding:10px 14px;border-radius:8px;background:linear-gradient(180deg,#0f3550,#05202b);color:#fff;border:none;box-shadow:0 6px 12px rgba(0,0,0,0.5);cursor:pointer}
+.level-btn:hover{transform:translateY(-4px)}
+
+.hidden{display:none !important}
+
+/* Store score */
+#store .store-score{position:relative;z-index:2;color:#fff;margin-bottom:8px;font-weight:700}
+
+/* Quiz buttons and feedback */
+.quiz-q{margin-bottom:10px}
+.quiz-q div{margin-bottom:6px}
+.quiz-q button{margin:6px 6px 6px 0;padding:8px 10px;border-radius:6px;border:none;background:#0b2430;color:#fff;cursor:pointer;transition:transform 180ms, background 240ms, box-shadow 200ms}
+.quiz-q button:hover{transform:translateY(-3px);box-shadow:0 6px 12px rgba(0,0,0,0.5)}
+.quiz-q button.correct{background:#2ecc71;box-shadow:0 6px 14px rgba(46,204,113,0.12);transform:scale(1.04)}
+.quiz-q button.wrong{background:#e74c3c;box-shadow:0 6px 14px rgba(231,76,60,0.12);transform:translateY(2px)}
+.quiz-feedback{margin-top:6px;color:#fff;font-weight:700;opacity:0;transition:opacity 300ms}
+.quiz-feedback.show{opacity:1}
+
+/* trio nav */
+#quiz-prev, #quiz-next{padding:6px 10px;border-radius:6px;border:none;background:#1b6b9a;color:#fff}
+
+
+
