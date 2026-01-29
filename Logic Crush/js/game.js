@@ -44,34 +44,41 @@ const candyImages = [
 
 // Levels / escenarios
 const levels = [
-  {name: 'Nivel 1 - Lobby', sceneClass: 'scene-lobby', target: 50, music: 'music/Music_Game/Ost/Giana Sisters [DS] music - World Map 3.mp3'},
-  {name: 'Nivel 2 - Tienda', sceneClass: 'scene-tienda', target: 100, music: 'music/Music_Game/Ost/Giana Sisters DS - Snow 1.mp3'},
-  {name: 'Nivel 3 - Bonus', sceneClass: 'scene-default', target: 180, music: 'music/Music_Game/Ost/Giana Sisters DS - Snow 2.mp3'}
+  {name: 'Nivel 1 - Lobby', sceneClass: 'scene-lobby', target: 50, music: 'music/Music_Game/Ost/Giana Sisters [DS] music - Dungeon theme 1.mp3'},
+  {name: 'Nivel 2 - Tienda', sceneClass: 'scene-tienda', target: 100, music: 'music/Music_Game/Ost/Giana Sisters DS OST - World Map 1 Music M+¦sica.mp3'},
+  {name: 'Nivel 3 - Bonus', sceneClass: 'scene-default', target: 180, music: 'music/Music_Game/Sound effect/Swish - Quick Bamboo Swish Swish, Swoop, Swoosh  Swipe Foley.mp3'}
 ];
 let currentLevel = null;
-let menuAudio = null; // persistent menu/store/options music
-let levelAudio = null; // music for the current level
+const musicAudio = new Audio();
+musicAudio.loop = true;
+musicAudio.volume = 0.6;
 let scoreMultiplier = 1;
-// menu music (exact filename on disk)
-const MENU_MUSIC = 'music/Music_Game/Ost/Giana Sisters DS OST - World Map 1 Music M+¦sica.mp3';
 
-function stopLevelAudio(){
+function stopMusic(){
   try{
-    if(levelAudio){
-      levelAudio.pause();
-      levelAudio.currentTime = 0;
-      levelAudio = null;
-    }
+    musicAudio.pause();
+    musicAudio.currentTime = 0;
+    musicAudio.removeAttribute('src');
+    musicAudio.load();
   }catch(e){}
 }
 
-function stopMenuAudio(){
+function playMusic(src){
+  stopMusic();
+  if(!src) return;
   try{
-    if(menuAudio){
-      menuAudio.pause();
-      menuAudio.currentTime = 0;
-    }
-  }catch(e){}
+    musicAudio.src = encodeURI(src);
+    musicAudio.load();
+    if(!(MUTE && MUTE.checked)) musicAudio.play().catch((err)=>{ console.warn('music play failed', err); });
+  }catch(e){ console.warn('music load failed', e); }
+}
+
+function getSceneMusic(screen){
+  if(screen===GAME_VIEW) return currentLevel ? currentLevel.music : null;
+  if(screen===MENU) return levels[0] ? levels[0].music : null;
+  if(screen===STORE) return levels[1] ? levels[1].music : null;
+  if(screen===OPTIONS) return levels[0] ? levels[0].music : null;
+  return null;
 }
 
 function startLevel(idx){
@@ -81,17 +88,6 @@ function startLevel(idx){
   document.body.className = currentLevel.sceneClass || 'scene-default';
   document.getElementById('level-name').textContent = currentLevel.name;
   document.getElementById('level-target').textContent = currentLevel.target;
-  // load level music: stop previous level audio, pause menu audio (but keep instance)
-  stopLevelAudio();
-  stopMenuAudio();
-  try{
-    const src = encodeURI(currentLevel.music);
-    levelAudio = new Audio(src);
-    levelAudio.loop = true;
-    levelAudio.volume = 0.6;
-    levelAudio.load();
-    if(!(MUTE && MUTE.checked)) levelAudio.play().catch((err)=>{ console.warn('level music play failed', err); });
-  }catch(e){ console.warn('music load failed', e); }
   // reset board
   roundScore = 0; updateRoundScore(); createBoard(); showScreen(GAME_VIEW);
 }
@@ -99,7 +95,7 @@ function startLevel(idx){
 function completeLevel(){
   if(!currentLevel) return;
   if(roundScore >= currentLevel.target){
-    stopLevelAudio();
+    stopMusic();
     score += roundScore;
     alert('Nivel completado! +'+roundScore+' puntos');
     roundScore = 0; updateRoundScore(); updateScore();
@@ -133,12 +129,8 @@ function showScreen(screen){
   STORE.classList.add('hidden');
   OPTIONS.classList.add('hidden');
   GAME_VIEW.classList.add('hidden');
+  playMusic(getSceneMusic(screen));
   screen.classList.remove('hidden');
-  if(screen !== GAME_VIEW){
-    stopLevelAudio();
-  } else {
-    stopMenuAudio();
-  }
   // set background depending on screen
   if(screen===MENU) document.body.className = 'scene-lobby';
   else if(screen===STORE) document.body.className = 'scene-tienda';
@@ -146,18 +138,6 @@ function showScreen(screen){
   else if(screen===GAME_VIEW) document.body.className = (currentLevel && currentLevel.sceneClass) ? currentLevel.sceneClass : 'scene-default';
   // when store opens, render a random quiz trio and update store score
   if(screen===STORE){ try{ renderTrio(); }catch(e){ console.warn('quiz render failed', e); } updateStoreScore(); }
-  // play/resume menu music on menu-like screens without recreating it
-  if(screen===MENU || screen===STORE || screen===OPTIONS){
-    try{
-      if(!menuAudio){
-        menuAudio = new Audio(encodeURI(MENU_MUSIC));
-        menuAudio.loop = true; menuAudio.volume = 0.6; menuAudio.load();
-      }
-      if(!(MUTE && MUTE.checked)){
-        menuAudio.play().catch(()=>{});
-      }
-    }catch(e){ console.warn('menu music failed', e); }
-  }
 }
 
 function playSound(s){ if(MUTE && MUTE.checked) return; try{ s.currentTime = 0; s.play(); }catch(e){}
@@ -327,7 +307,7 @@ function updateStoreScore(){ const s = document.getElementById('store-score'); i
 function updateLives(){
   LIVES.textContent = 'Vidas: ' + lives;
   if(lives<=0) {
-    stopLevelAudio();
+    stopMusic();
     alert('Game over');
     lives=3; score=0; createBoard(); updateLives(); updateScore(); showScreen(MENU);
   }
@@ -338,10 +318,7 @@ SHUFFLE.addEventListener('click', ()=>{ for(const s of squares){ const t = Math.
 RESTART.addEventListener('click', ()=>{ roundScore=0; score=0; lives=3; updateScore(); updateLives(); updateRoundScore(); createBoard(); });
 
 // Menu and store handlers
-BTN_PLAY.addEventListener('click', ()=>{ 
-  // start level 0 (menu music will be paused by startLevel but its instance is preserved)
-  startLevel(0);
-});
+BTN_PLAY.addEventListener('click', ()=>{ showScreen(GAME_VIEW); createBoard(); updateLives(); updateScore(); });
 BTN_STORE.addEventListener('click', ()=>{ showScreen(STORE); });
 BTN_OPTIONS.addEventListener('click', ()=>{ showScreen(OPTIONS); });
 BTN_EXIT.addEventListener('click', ()=>{ window.close(); });
@@ -368,28 +345,30 @@ document.querySelectorAll('.level-btn').forEach(b=>{
 
 // finish level
 if(FINISH_LEVEL) FINISH_LEVEL.addEventListener('click', ()=>{ completeLevel(); });
-if(EXIT_TO_MENU) EXIT_TO_MENU.addEventListener('click', ()=>{ stopLevelAudio(); showScreen(MENU); });
+if(EXIT_TO_MENU) EXIT_TO_MENU.addEventListener('click', ()=>{ stopMusic(); showScreen(MENU); });
 
 // Quiz: 20 questions about algorithms & data structures
 const questionsPool = [
-  // UNIDAD I: LEYES DE COMPOSICIÓN INTERNA (5)
-  {q:'¿Qué propiedad garantiza que a*(b*c) = (a*b)*c para todos los elementos?', a:['Asociativa','Conmutativa','Distributiva'], correct:0},
-  {q:'¿Cuál ley asegura que para todo a,b en S, la operación a*b pertenece a S?', a:['Clausura','Elemento neutro','Inverso'], correct:0},
-  {q:'¿Qué ley dice que a*b = b*a para todos los elementos a y b?', a:['Conmutativa','Asociativa','Idempotente'], correct:0},
-  {q:'¿Qué es un elemento neutro e respecto de una operación *?', a:['Elemento que no cambia a bajo * (e*a = a)','Elemento que anula la operación','Elemento que invierte la operación'], correct:0},
-  {q:'¿Qué condición define que un elemento a tenga inverso respecto a *?', a:['Existe b tal que a*b = e','a*a = e','a*b = b*a'], correct:0},
-  // UNIDAD II: ESTRUCTURAS ALGEBRAICAS (5)
-  {q:'¿Cómo se llama una estructura con operación cerrada y asociativa?', a:['Semigrupo','Monóide','Grupo'], correct:0},
-  {q:'¿Qué añade un monóide a un semigrupo?', a:['Elemento neutro','Inversos para todos','Conmutatividad'], correct:0},
-  {q:'¿Qué estructura exige existencia de inversos para todos los elementos (y neutro)?', a:['Grupo','Anillo','Semigrupo'], correct:0},
-  {q:'¿Qué estructura tiene dos operaciones (suma y producto) con distributividad?', a:['Anillo','Grupo','Monóide'], correct:0},
-  {q:'¿Qué es un cuerpo (campo)?', a:['Anillo donde todo elemento no nulo tiene inverso multiplicativo','Grupo abeliano simple','Semigrupo conmutativo'], correct:0},
-  // UNIDAD III: ESTRUCTURAS DINÁMICAS (5)
-  {q:'¿Qué estructura de datos sigue LIFO (last-in, first-out)?', a:['Pila','Cola','Lista enlazada'], correct:0},
-  {q:'¿Qué estructura sigue FIFO (first-in, first-out)?', a:['Cola','Pila','Árbol'], correct:0},
-  {q:'¿Qué estructura permite inserciones y borrados eficientes en cualquier extremo?', a:['Lista enlazada','Tabla hash','Heap'], correct:0},
-  {q:'¿Qué estructura está formada por nodos y aristas y no necesita jerarquía?', a:['Grafo','Árbol','Lista'], correct:0},
-  {q:'¿Qué estructura representa relaciones jerárquicas con raíz y subárboles?', a:['Árbol','Cola','Pila'], correct:0}
+  {q:'¿Qué estructura usa FIFO (first-in, first-out)?', a:['Cola','Pila','Árbol'], correct:0},
+  {q:'¿Qué estructura usa LIFO (last-in, first-out)?', a:['Pila','Cola','Grafo'], correct:0},
+  {q:'¿Complejidad promedio de búsqueda en un hash table?', a:['O(1)','O(n)','O(log n)'], correct:0},
+  {q:'¿Complejidad de búsqueda en lista enlazada (sin índice)?', a:['O(n)','O(1)','O(log n)'], correct:0},
+  {q:'¿Qué recorrido de árbol visita raíz, izquierda, derecha?', a:['Preorden','Inorden','Postorden'], correct:0},
+  {q:'¿Qué algoritmo es para búsqueda en grafos por anchura?', a:['BFS','DFS','Dijkstra'], correct:0},
+  {q:'¿Qué algoritmo recorre en profundidad?', a:['DFS','BFS','Kruskal'], correct:0},
+  {q:'¿Algoritmo para ordenar con mejor caso O(n log n)?', a:['MergeSort','BubbleSort','InsertionSort'], correct:0},
+  {q:'¿Estructura ideal para LRU cache?', a:['Hash + lista doblemente enlazada','Árbol binario de búsqueda','Cola'], correct:0},
+  {q:'¿Complejidad de insertar en heap (priority queue)?', a:['O(log n)','O(1)','O(n)'], correct:0},
+  {q:'¿Qué estructura representa mejor relaciones 1:N jerárquicas?', a:['Árbol','Lista enlazada','Hash table'], correct:0},
+  {q:'¿Qué método divide y vencerás se usa en QuickSort?', a:['Partición','Fusión','Heapify'], correct:0},
+  {q:'¿Qué garantiza un árbol AVL?', a:['Balanceo por altura','Óptimo en memoria','Orden aleatorio'], correct:0},
+  {q:'¿Para qué sirve un grafo dirigido acíclico (DAG)?', a:['Orden topológico','Búsqueda BFS exclusiva','Hashing'], correct:0},
+  {q:'¿Qué algoritmo encuentra caminos mínimos con pesos positivos?', a:['Dijkstra','BFS','Prim'], correct:0},
+  {q:'¿Qué estructura es mejor para undo/redo?', a:['Pilas','Colas','Árboles'], correct:0},
+  {q:'¿Qué es un recorrido in-order en BST?', a:['Devuelve elementos ordenados','Devuelve raíz primero','No tiene orden'], correct:0},
+  {q:'¿Qué necesita un algoritmo greedy?', a:['Propiedad de elección local óptima','Backtracking','Programación dinámica'], correct:0},
+  {q:'¿Qué estructura es eficiente para prefijos (autocomplete)?', a:['Trie','Hash table','Heap'], correct:0},
+  {q:'¿Qué algoritmo construye árbol de expansión mínima?', a:['Kruskal','QuickSort','Dijkstra'], correct:0}
 ];
 
 function pickRandomTrio(){
@@ -404,10 +383,6 @@ function renderTrio(){
   if(!root) return;
   root.innerHTML = '';
   const trio = pickRandomTrio();
-  let answeredCount = 0;
-  // remove any existing more button
-  const removeMoreButton = ()=>{ const mb = document.getElementById('more-quiz-btn'); if(mb && mb.parentNode) mb.parentNode.removeChild(mb); };
-  removeMoreButton();
   trio.forEach((qs, qi)=>{
     const div = document.createElement('div'); div.className='quiz-q';
     const p = document.createElement('div'); p.textContent = (qi+1)+'. '+qs.q; div.appendChild(p);
@@ -432,17 +407,6 @@ function renderTrio(){
         }
         // animation clear
         setTimeout(()=>{ feedback.classList.remove('show'); },900);
-        // track answered and show "Más preguntas" button when all answered
-        answeredCount++;
-        if(answeredCount >= trio.length){
-          // create a small action area with a button to load more
-          removeMoreButton();
-          const more = document.createElement('div'); more.style.marginTop = '12px';
-          const moreBtn = document.createElement('button'); moreBtn.id = 'more-quiz-btn'; moreBtn.textContent = 'Más preguntas'; moreBtn.className = 'btn-secondary';
-          moreBtn.addEventListener('click', ()=>{ renderTrio(); });
-          more.appendChild(moreBtn);
-          root.appendChild(more);
-        }
       });
       div.appendChild(btn);
     });
@@ -450,24 +414,11 @@ function renderTrio(){
   });
 }
 
-// hook up the header random-quiz button (if present)
-document.addEventListener('DOMContentLoaded', ()=>{
-  const hdrBtn = document.getElementById('btn-random-quiz');
-  if(hdrBtn){ hdrBtn.addEventListener('click', ()=>{ renderTrio(); }); }
-});
-
 // Some browsers block autoplay until a user gesture — resume music on first click
 document.addEventListener('click', ()=>{
   try{
-    const gameVisible = !GAME_VIEW.classList.contains('hidden');
-    if(gameVisible){
-      if(levelAudio && levelAudio.paused && !(MUTE && MUTE.checked)){
-        levelAudio.play().catch(err=>{ console.warn('resume level play failed', err); });
-      }
-    } else {
-      if(menuAudio && menuAudio.paused && !(MUTE && MUTE.checked)){
-        menuAudio.play().catch(err=>{ console.warn('resume menu play failed', err); });
-      }
+    if(musicAudio.src && musicAudio.paused && !(MUTE && MUTE.checked)){
+      musicAudio.play().catch(err=>{ console.warn('resume play failed', err); });
     }
   }catch(e){ }
 });
@@ -476,8 +427,8 @@ document.addEventListener('click', ()=>{
 // mute toggle affects music
 if(MUTE){
   MUTE.addEventListener('change', ()=>{
-    if(MUTE.checked){ if(levelAudio) levelAudio.pause(); if(menuAudio) menuAudio.pause(); }
-    else { if(levelAudio) levelAudio.play().catch(()=>{}); if(menuAudio) menuAudio.play().catch(()=>{}); }
+    if(MUTE.checked){ musicAudio.pause(); }
+    else if(musicAudio.src){ musicAudio.play().catch(()=>{}); }
   });
 }
 
@@ -498,5 +449,3 @@ showScreen(MENU);
 createBoard();
 setTimeout(()=>{ while(checkAndClear()){ dropCandies(); } updateRoundScore(); },200);
 
-// ensure store-back also stops any level music
-if(STORE_BACK){ STORE_BACK.addEventListener('click', ()=>{ try{ if(musicAudio) musicAudio.pause(); }catch(e){} showScreen(MENU); }); }
